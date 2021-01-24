@@ -16,9 +16,9 @@ setInterval(() => {
     (Axios.get(`${URL}/channels/`)
         .then((res => {
             if (res.data.live[0].apps.length > 0) { //если хотябы 1 канал онлайн
-                data = res.data.live[0].apps.find(stream => stream.appName === 'live').channels
-                dataMain = data.find(channel => channel.channelName === 'main')
-                dataKino = data.find(channel => channel.channelName === 'kino')
+                data = res.data.live[0].apps[0].channels
+                dataMain = data[0]
+                dataKino = data[1]
 
                 if (dataMain && !botSendedStatusMain) {
                     sendStatus(dataMain)
@@ -35,7 +35,6 @@ setInterval(() => {
             } else { //если все каналы оффлайн
                 botSendedStatusMain = false
                 botSendedStatusKino = false
-                console.log('Channels offline')
             }
         }))
         .catch((error) => { console.log(error) })
@@ -46,7 +45,7 @@ setInterval(() => {
 const sendStatus = async (data) => {
     let streamerName = await getStreamerName(data.publisher.userId)
     sendMessage(data, streamerName)
-    console.log(`On channel: ${data.channelName}, streamer: ${streamerName}`)
+    console.log(`On channel: ${data.channel}, streamer: ${streamerName}`)
 }
 
 //Функция получения имени стримера
@@ -61,22 +60,21 @@ const getStreamerName = async (userId) => {
 
 //Функция отправки статуса в чат в зависимости от активного канала.
 const sendMessage = (data, streamerName) => {
-    if (data.channelName === 'main') {
+    if (data.channel === 'main') {
         bot.sendPhoto(chat_id, './assets/MainOnline.png', { caption: `Стримит: ${streamerName}` });
         botSendedStatusMain = true
-        console.log(`Stream MAIN is Online`)
     }
-    if (data.channelName === 'kino') {
+    if (data.channel === 'kino') {
         bot.sendPhoto(chat_id, './assets/KinoOnline.png', { caption: `Показывает: ${streamerName}` });
         botSendedStatusKino = true
-        console.log(`Stream KINO is Online`)
     }
 }
 
 //Реакция бота на ключевые слова в чате
 bot.on('text', (msg) => {
-    let userText = msg.text
-    if (userText.includes(('кабан')) && userText.includes(('стрим'))) {
+    let userText = msg.text.toLowerCase()
+
+    if (userText.includes('кабан') && userText.includes('стрим')) {
         if (botSendedStatusMain) {
             bot.sendMessage(chat_id, `На мэйне есть стрим`)
         }
@@ -87,4 +85,20 @@ bot.on('text', (msg) => {
             bot.sendMessage(chat_id, `Нету стримов`)
         }
     }
+    if (userText.includes('кабан') && userText.includes('арма') && userText.includes('когда')) {
+        bot.sendMessage(chat_id, `соооооооон`)
+    }
+
+    if (userText.includes('сколько') && userText.includes('истребителей')) {
+        bot.sendMessage(chat_id, `50 истребителей зеро, 40 торпедоносцев и 81 пикирующий бомбардировщик`)
+    }
+    if (userText.includes('какие') && userText.includes('корабли')) {
+        bot.sendMessage(chat_id, `Аризона, Вест-Вирджиния, Оклахома и Мэрилэнд`)
+        bot.sendMessage(chat_id, `Это КЛАССИКА блять ЭТО ЗНАТЬ НАДО!!!`)
+    }
+    if (userText === 'да') {
+        bot.sendMessage(chat_id, `*хрю* ПИЗДА *хрю*`)
+    }
 })
+
+
