@@ -1,0 +1,5 @@
+{
+    "token": "your bot token, check BotFather",
+    "chatId": "your chat id", 
+    "url": "https://yoursite.ajax" 
+}
